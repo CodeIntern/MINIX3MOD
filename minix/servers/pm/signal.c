@@ -872,45 +872,39 @@ void vm_notify_sig_wrapper(endpoint_t ep)
 
 int do_semcreate()
 {
-  /*
   int semid = m_in.m_u32.data[0];
   register struct mproc *rmp = mp;
 
-  if(msemaphores[semid].created == 0 && msemaphores[sem_id].owner_e == rmp)
+  if(msemas[semid].created == 0 && msemas[semid].owner == NULL && msemas[semid].head == NULL && msemas[semid].tail == NULL && msemas[semid].value == 0)
   {
-    msemaphores[sem_id].created = 1;
+    printf("SEMAPHORE %d CHANGED TO ONLINE\n", semid);
+    msemas[semid].created = 1;
   }
   else
   {
+    printf("Can't Change To Online\n Created %d Value %d Owner %p Head %p Tail %p \n", msemas[semid].created, msemas[semid].value, msemas[semid].owner, msemas[semid].head, msemas[semid].tail);
     return -1;
   } 
-  */
+
   return 0;
 }
 
 int do_semdelete()
 {
-  /*
   int sem_id = m_in.m_u32.data[0];
   register struct mproc *rmp = mp;
 
-  if(msemaphores[sem_id].owner_e == rmp && msemaphores[sem_id].created == 1)
+  if(msemas[sem_id].owner == NULL && msemas[sem_id].created == 1 && msemas[sem_id].value == 0 && msemas[sem_id].head == NULL && msemas[sem_id].tail == NULL)
   {
-    if(msemaphores[sem_id].phead == NULL && msemaphores[sem_id].mtail == NULL)
-    {
-      msemaphores[sem_id].created = 0;
-      msemaphores[sem_id].value = 0;
-    }
-    else
-    {
-      return -1;
-    }
+	printf("SEMAPHORE %d OFFLINED\n", sem_id);
+	msemas[sem_id].created = 0;
   }
   else
   {
+    printf("FAILED CHANGE TO OFFLINE CREATED %d VALUE %d OWNER %p HEAD %p TAIL %p \n", msemas[sem_id].created, msemas[sem_id].value, msemas[sem_id].owner, msemas[sem_id].head, msemas[sem_id].tail);
     return -1;
   }
-  */
+
   return 0;
 }
 
@@ -930,13 +924,13 @@ int do_semdown()
     printf("\nLAZY ERROR: ENDPOINT IS 0\n");
     return -1;
   }
-/*
-  if(msemaphores[sem_id].created == 0)
+
+  if(msemas[sem_id].created == 0)
   {
     printf("\nERROR: SEM NOT CREATED\n");
     return -1;
   }
-*/
+
   if(msemas[sem_id].value == 0)
   {
     if(msemas[sem_id].owner == NULL && msemas[sem_id].head == NULL && msemas[sem_id].tail == NULL)
@@ -1018,13 +1012,13 @@ int do_semup()
     printf("\nLAZY ERROR: ENDPOINT IS 0\n");
     return -1;
   }
-  /*
-  if(msemaphores[sem_id].created == 0)
+  
+  if(msemas[sem_id].created == 0)
   {
     printf("\nERROR: SEM NOT CREATED \n");
     return -1;
   }
-  */
+
   if(msemas[sem_id].owner == NULL || msemas[sem_id].owner != rmp)
   {
     printf("\nERROR:OWNER IS EITHER NULL OR DIFFERENT\n");
