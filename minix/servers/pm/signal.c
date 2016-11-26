@@ -869,3 +869,205 @@ void vm_notify_sig_wrapper(endpoint_t ep)
 	}
   }
 }
+
+int do_semcreate()
+{
+  /*
+  int semid = m_in.m_u32.data[0];
+  register struct mproc *rmp = mp;
+
+  if(msemaphores[semid].created == 0 && msemaphores[sem_id].owner_e == rmp)
+  {
+    msemaphores[sem_id].created = 1;
+  }
+  else
+  {
+    return -1;
+  } 
+  */
+  return 0;
+}
+
+int do_semdelete()
+{
+  /*
+  int sem_id = m_in.m_u32.data[0];
+  register struct mproc *rmp = mp;
+
+  if(msemaphores[sem_id].owner_e == rmp && msemaphores[sem_id].created == 1)
+  {
+    if(msemaphores[sem_id].phead == NULL && msemaphores[sem_id].mtail == NULL)
+    {
+      msemaphores[sem_id].created = 0;
+      msemaphores[sem_id].value = 0;
+    }
+    else
+    {
+      return -1;
+    }
+  }
+  else
+  {
+    return -1;
+  }
+  */
+  return 0;
+}
+
+int do_semdown()
+{
+  int sem_id = (int) m_in.m_u32.data[0];
+  register struct mproc *rmp = mp;
+
+  if(sem_id >= 31 || sem_id < 0)
+  {
+    printf("\nERROR: SEM_ID OUT OF RANGE\n");
+    return -1;
+  }
+
+  if(rmp->mp_endpoint == 0)
+  {
+    printf("\nLAZY ERROR: ENDPOINT IS 0\n");
+    return -1;
+  }
+/*
+  if(msemaphores[sem_id].created == 0)
+  {
+    printf("\nERROR: SEM NOT CREATED\n");
+    return -1;
+  }
+*/
+  if(msemaphores[sem_id].value == 0)
+  {
+    if(msemaphores[sem_id].owner_e == NULL && msemaphores[sem_id].phead == NULL && msemaphores[sem_id].mtail == NULL)
+    {
+      msemaphores[sem_id].value--;
+      msemaphores[sem_id].owner_e = rmp;
+    }
+    else
+    {
+      printf("\nERROR:OWNER HEAD OR TAIL NOT NULL\n");
+      return -1;
+    }
+  }
+  else if(msemaphores[sem_id].value == -1)
+  {
+    if(msemaphores[sem_id].owner_e != NULL && msemaphores[sem_id].owner_e != rmp)
+    {
+      if(rmp->sem_next != NULL)
+      {
+        printf("\nWARNING: SEM_NEXT IS NOT NULL\n");
+      }
+
+      if(msemaphores[sem_id].phead == NULL && msemaphores[sem_id].mtail == NULL)
+      {
+        msemaphores[sem_id].phead = rmp;
+        msemaphores[sem_id].mtail = rmp;
+      }
+      else if(msemaphores[sem_id].phead != NULL && msemaphores[sem_id].mtail != NULL)
+      {
+        msemaphores[sem_id].mtail->sem_next = rmp;
+        msemaphores[sem_id].mtail = rmp;
+      }
+      else 
+      {
+        printf("\nERROR: HEAD AND TAIL NOT SYNCHRNIZED\n");
+        return -1;
+      }
+
+      if(stop_proc(rmp->mp_endpoint, TRUE) == OK) 
+      {
+        printf("\nBLOCK PROCESS Successful\n");
+      }
+      else
+      {
+        printf("\nBLOCK PROCESS DELAYED\n");
+      }
+
+    }
+    else
+    {
+      printf("\nERROR: OWNER SHOULD BE EMPTY OR IS SAME AS CALLER\n");
+      printf("\nVALUE: %d, OWNER %p, HEAD: %p, TAIL: %p\n", msemaphores[sem_id].value, msemaphores[sem_id].owner_e, msemaphores[sem_id].phead, msemaphores[sem_id].mtail);
+      return -1;
+    }
+  }
+  else
+  {
+    printf("\nERROR: SEM VALUE IS NOT 1 or 0\n");
+    return -1;
+  }
+
+  return 0;
+}
+
+int do_semup()
+{
+  int sem_id = (int) m_in.m_u32.data[0];
+  register struct mproc *rmp = mp;
+  register struct mproc *temp;
+
+  if(sem_id >= 31 || sem_id < 0)
+  {
+    printf("\nERROR: SEM ID OUT OF RANGE\n");
+    return -1;
+  }
+
+  if(rmp->mp_endpoint == 0)
+  {
+    printf("\nLAZY ERROR: ENDPOINT IS 0\n");
+    return -1;
+  }
+  /*
+  if(msemaphores[sem_id].created == 0)
+  {
+    printf("\nERROR: SEM NOT CREATED \n");
+    return -1;
+  }
+  */
+  if(msemaphores[sem_id].owner_e == NULL || msemaphores[sem_id].owner_e != rmp)
+  {
+    printf("\nERROR:OWNER IS EITHER NULL OR DIFFERENT\n");
+    return -1;
+  }
+
+  if(msemaphores[sem_id].value == -1)
+  {
+    if(msemaphores[sem_id].phead == NULL && msemaphores[sem_id].mtail == NULL)
+    {
+      msemaphores[sem_id].value++;
+      msemaphores[sem_id].owner_e = NULL;
+    }
+    else if(msemaphores[sem_id].phead != NULL && msemaphores[sem_id].mtail != NULL)
+    {
+      temp = msemaphores[sem_id].phead;
+      msemaphores[sem_id].phead = temp->sem_next;
+      msemaphores[sem_id].owner_e = temp;
+      if(msemaphores[sem_id].phead == NULL)
+      {
+        msemaphores[sem_id].mtail = NULL;
+      }
+      temp->sem_next = NULL;
+      /*
+      if(sys_kill(temp->mp_endpoint, SIGCONT) != OK)
+      {
+        printf("\nERROR: UNBLOCK FAILED\n");
+        return -1;
+      }
+      */
+      try_resume_proc(temp);
+    }
+    else
+    {
+      printf("\nERROR:SEM_UP INCONSISTENT HEAD AND TAIL\n");
+      return -1;
+    }
+  }
+  else
+  {
+    printf("\nERROR: SEM VALUE SHOULD BE SET 0\n");
+    return -1;
+  }
+
+  return 0;
+}

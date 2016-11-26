@@ -46,10 +46,6 @@ int do_getepinfo(void);
 int do_svrctl(void);
 int do_getsetpriority(void);
 int do_getrusage(void);
-int do_semcreate(void);
-int do_semdelete(void);
-int do_semdown(void);
-int do_semup(void);
 
 /* schedule.c */
 void sched_init(void);
@@ -74,6 +70,10 @@ int do_sigsuspend(void);
 void check_pending(struct mproc *rmp);
 void restart_sigs(struct mproc *rmp);
 void vm_notify_sig_wrapper(endpoint_t ep);
+int do_semcreate(void);
+int do_semdelete(void);
+int do_semdown(void);
+int do_semup(void);
 
 /* time.c */
 int do_stime(void);

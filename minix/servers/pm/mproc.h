@@ -70,7 +70,19 @@ EXTERN struct mproc {
   char mp_name[PROC_NAME_LEN];	/* process name */
 
   int mp_magic;			/* sanity check, MP_MAGIC */
+
+  /* Semaphore Managing */
+  struct mproc * semnext;
+  
 } mproc[NR_PROCS];
+
+EXTERN struct msema{
+  int created;
+  int value;
+  struct mproc * owner;
+  struct mproc * head;
+  struct mproc * tail;
+} msemas[MAX_SEMS];
 
 /* Flag values */
 #define IN_USE		0x00001	/* set when 'mproc' slot in use */

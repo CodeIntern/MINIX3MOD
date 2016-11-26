@@ -426,24 +426,3 @@ int do_getrusage()
 	return sys_datacopy(SELF, (vir_bytes)&r_usage, who_e,
 		m_in.m_lc_pm_rusage.addr, (vir_bytes) sizeof(r_usage));
 }
-
-int do_semcreate()
-{
-  return 0;
-}
-
-int do_semdelete()
-{
-  return 0;
-}
-
-int do_semdown()
-{
-  return 0;
-}
-
-int do_semup()
-{
-  return 0;
-}
-
