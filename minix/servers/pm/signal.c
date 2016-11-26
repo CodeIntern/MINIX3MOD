@@ -937,12 +937,12 @@ int do_semdown()
     return -1;
   }
 */
-  if(msemaphores[sem_id].value == 0)
+  if(msemas[sem_id].value == 0)
   {
-    if(msemaphores[sem_id].owner_e == NULL && msemaphores[sem_id].phead == NULL && msemaphores[sem_id].mtail == NULL)
+    if(msemas[sem_id].owner == NULL && msemas[sem_id].head == NULL && msemas[sem_id].tail == NULL)
     {
-      msemaphores[sem_id].value--;
-      msemaphores[sem_id].owner_e = rmp;
+      msemas[sem_id].value--;
+      msemas[sem_id].owner = rmp;
     }
     else
     {
@@ -950,24 +950,24 @@ int do_semdown()
       return -1;
     }
   }
-  else if(msemaphores[sem_id].value == -1)
+  else if(msemas[sem_id].value == -1)
   {
-    if(msemaphores[sem_id].owner_e != NULL && msemaphores[sem_id].owner_e != rmp)
+    if(msemas[sem_id].owner != NULL && msemas[sem_id].owner != rmp)
     {
-      if(rmp->sem_next != NULL)
+      if(rmp->semnext != NULL)
       {
         printf("\nWARNING: SEM_NEXT IS NOT NULL\n");
       }
 
-      if(msemaphores[sem_id].phead == NULL && msemaphores[sem_id].mtail == NULL)
+      if(msemas[sem_id].head == NULL && msemas[sem_id].tail == NULL)
       {
-        msemaphores[sem_id].phead = rmp;
-        msemaphores[sem_id].mtail = rmp;
+        msemas[sem_id].head = rmp;
+        msemas[sem_id].tail = rmp;
       }
-      else if(msemaphores[sem_id].phead != NULL && msemaphores[sem_id].mtail != NULL)
+      else if(msemas[sem_id].head != NULL && msemas[sem_id].tail != NULL)
       {
-        msemaphores[sem_id].mtail->sem_next = rmp;
-        msemaphores[sem_id].mtail = rmp;
+        msemas[sem_id].tail->semnext = rmp;
+        msemas[sem_id].tail = rmp;
       }
       else 
       {
@@ -975,7 +975,7 @@ int do_semdown()
         return -1;
       }
 
-      if(stop_proc(rmp->mp_endpoint, TRUE) == OK) 
+      if(stop_proc(rmp, TRUE) == OK) 
       {
         printf("\nBLOCK PROCESS Successful\n");
       }
@@ -988,7 +988,7 @@ int do_semdown()
     else
     {
       printf("\nERROR: OWNER SHOULD BE EMPTY OR IS SAME AS CALLER\n");
-      printf("\nVALUE: %d, OWNER %p, HEAD: %p, TAIL: %p\n", msemaphores[sem_id].value, msemaphores[sem_id].owner_e, msemaphores[sem_id].phead, msemaphores[sem_id].mtail);
+      printf("\nVALUE: %d, OWNER %p, HEAD: %p, TAIL: %p\n", msemas[sem_id].value, msemas[sem_id].owner, msemas[sem_id].head, msemas[sem_id].tail);
       return -1;
     }
   }
@@ -1025,29 +1025,29 @@ int do_semup()
     return -1;
   }
   */
-  if(msemaphores[sem_id].owner_e == NULL || msemaphores[sem_id].owner_e != rmp)
+  if(msemas[sem_id].owner == NULL || msemas[sem_id].owner != rmp)
   {
     printf("\nERROR:OWNER IS EITHER NULL OR DIFFERENT\n");
     return -1;
   }
 
-  if(msemaphores[sem_id].value == -1)
+  if(msemas[sem_id].value == -1)
   {
-    if(msemaphores[sem_id].phead == NULL && msemaphores[sem_id].mtail == NULL)
+    if(msemas[sem_id].head == NULL && msemas[sem_id].tail == NULL)
     {
-      msemaphores[sem_id].value++;
-      msemaphores[sem_id].owner_e = NULL;
+      msemas[sem_id].value++;
+      msemas[sem_id].owner = NULL;
     }
-    else if(msemaphores[sem_id].phead != NULL && msemaphores[sem_id].mtail != NULL)
+    else if(msemas[sem_id].head != NULL && msemas[sem_id].tail != NULL)
     {
-      temp = msemaphores[sem_id].phead;
-      msemaphores[sem_id].phead = temp->sem_next;
-      msemaphores[sem_id].owner_e = temp;
-      if(msemaphores[sem_id].phead == NULL)
+      temp = msemas[sem_id].head;
+      msemas[sem_id].head = temp->semnext;
+      msemas[sem_id].owner = temp;
+      if(msemas[sem_id].head == NULL)
       {
-        msemaphores[sem_id].mtail = NULL;
+        msemas[sem_id].tail = NULL;
       }
-      temp->sem_next = NULL;
+      temp->semnext = NULL;
       /*
       if(sys_kill(temp->mp_endpoint, SIGCONT) != OK)
       {
