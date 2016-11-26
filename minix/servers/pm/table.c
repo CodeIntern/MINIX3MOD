@@ -58,5 +58,9 @@ int (* const call_vec[NR_PM_CALLS])(void) = {
 	CALL(PM_EXEC_RESTART)	= do_execrestart,
 	CALL(PM_GETEPINFO)	= do_getepinfo,		/* getepinfo(2) */
 	CALL(PM_GETPROCNR)	= do_getprocnr,		/* getprocnr(2) */
-	CALL(PM_GETSYSINFO)	= do_getsysinfo		/* getsysinfo(2) */
+	CALL(PM_GETSYSINFO)	= do_getsysinfo,		/* getsysinfo(2) */
+	CALL(PM_SEMCREATE)	= do_semcreate,
+	CALL(PM_SEMDELETE)	= do_semdelete,
+	CALL(PM_SEMDOWN)	= do_semdown,
+	CALL(PM_SEMUP)		= do_semup
 };

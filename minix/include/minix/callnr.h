@@ -47,19 +47,23 @@
 #define PM_CLOCK_GETTIME	(PM_BASE + 34)
 #define PM_CLOCK_SETTIME	(PM_BASE + 35)
 #define PM_GETRUSAGE		(PM_BASE + 36)
-#define PM_REBOOT		(PM_BASE + 37)
-#define PM_SVRCTL		(PM_BASE + 38)
-#define PM_SPROF		(PM_BASE + 39)
-#define PM_CPROF		(PM_BASE + 40)
-#define PM_SRV_FORK		(PM_BASE + 41)
-#define PM_SRV_KILL		(PM_BASE + 42)
-#define PM_EXEC_NEW		(PM_BASE + 43)
+#define PM_REBOOT			(PM_BASE + 37)
+#define PM_SVRCTL			(PM_BASE + 38)
+#define PM_SPROF			(PM_BASE + 39)
+#define PM_CPROF			(PM_BASE + 40)
+#define PM_SRV_FORK			(PM_BASE + 41)
+#define PM_SRV_KILL			(PM_BASE + 42)
+#define PM_EXEC_NEW			(PM_BASE + 43)
 #define PM_EXEC_RESTART		(PM_BASE + 44)
 #define PM_GETEPINFO		(PM_BASE + 45)
 #define PM_GETPROCNR		(PM_BASE + 46)
 #define PM_GETSYSINFO		(PM_BASE + 47)
+#define PM_SEMCREATE 		(PM_BASE + 48)
+#define PM_SEMDELETE 		(PM_BASE + 49)
+#define PM_SEMDOWN 			(PM_BASE + 50)
+#define PM_SEMUP 			(PM_BASE + 51)
 
-#define NR_PM_CALLS		48	/* highest number from base plus one */
+#define NR_PM_CALLS		52	/* highest number from base plus one */
 
 /*===========================================================================*
  *				Calls to VFS				     *
